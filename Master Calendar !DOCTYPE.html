@@ -699,7 +699,8 @@ const jobStatusFilter = document.getElementById('filterJobStatus').value;
             if (!j.scheduled_start) return false;
 
             // Convert to simple date string (YYYY-MM-DD) for matching
-            const jobDate = new Date(j.scheduled_start).toISOString().split('T')[0];
+            const jobDate = j.scheduled_start.split('T')[0];
+
             
             if (jobDate !== dateKey) return false;
             if (areaFilter !== "ALL" && j.service_area !== areaFilter) return false;
@@ -1182,4 +1183,5 @@ function populateAssignCleanerSelect() {
 </div>
 </body>
 </html>
+
 
