@@ -911,8 +911,17 @@ function closeDetailModal() {
 
 // --- JOB ASSIGNMENT & CONFLICT LOGIC ---
 function openJobAssignmentModal(job) {
+	const modal = document.getElementById('jobAssignmentModal');
+const assignJobIdEl = document.getElementById('assignJobId');
+
+if (!modal || !assignJobIdEl) {
+    console.error("Job Assignment Modal DOM not ready");
+    return;
+}
+
     // Fill Primary Hidden ID
-    document.getElementById('assignJobId').value = job.job_id;
+    assignJobIdEl.value = job.job_id;
+
 
     // Set Editable Fields
     document.getElementById('editJobFirstName').value = job.first_name || '';
@@ -1121,6 +1130,7 @@ function populateAssignCleanerSelect() {
 
 <div class="modal-backdrop" id="jobAssignmentModal" style="display:none; align-items: center; justify-content: center;">
     <div class="modal-card" style="border: 1px solid var(--primary); width: 450px; display: flex; flex-direction: column; max-height: 90vh;">
+		<input type="hidden" id="assignJobId">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-shrink: 0;">
             <h3 class="modal-title" style="margin: 0;">Job Assignment</h3>
             <span id="jobStatusBadge" style="font-size: 10px; padding: 4px 8px; border-radius: 4px; font-weight: bold;"></span>
@@ -1231,6 +1241,7 @@ function populateAssignCleanerSelect() {
 </div>
 </body>
 </html>
+
 
 
 
