@@ -793,7 +793,9 @@ document.getElementById('modalArea').value = shift.service_area || "";
         }
 
         window.closeModal = function() { modal.style.display = 'none'; }
-
+window.closeJobModal = function() {
+    document.getElementById('jobAssignmentModal').style.display = 'none';
+}
         // --- DATABASE ACTIONS ---
         async function saveShift() {
             const id = document.getElementById('slotId').value;
@@ -1180,12 +1182,13 @@ function populateAssignCleanerSelect() {
         <div class="modal-actions" style="margin-top: 25px;">
             <button class="primary-btn btn-full" onclick="saveJobAssignment()">Save Assignment</button>
             <button type="button" class="primary-btn btn-full" style="background: #3b82f6; margin-left: 10px;" onclick="notifyCleaner()">Notify Cleaner</button>
-            <button class="nav-icon-btn" style="width:40px;" onclick="closeAssignmentModal()">✕</button>
+            <button class="nav-icon-btn" style="width:40px;" onclick="closeJobModal()">✕</button>
         </div>
     </div>
 </div>
 </body>
 </html>
+
 
 
 
