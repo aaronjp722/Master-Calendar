@@ -542,13 +542,13 @@ window.loadData = async function loadData() {
 
     if (availRes.error) console.error("AVAIL ERROR", availRes.error);
 if (jobsRes.error) console.error("JOBS ERROR", jobsRes.error);
-	console.log("DEBUG: Data check - Job 0 Area:", window.allJobs[0]?.service_area);
+	
 if (assignRes.error) console.error("ASSIGN ERROR", assignRes.error);
 
     
     window.allShifts = availRes.data || [];
-    window.allJobs = jobsRes.data || [];
-	console.log("ALL JOBS LOADED:", window.allJobs);
+window.allJobs = jobsRes.data || [];
+console.log("DEBUG: Data check - Job 0 Area:", window.allJobs[0]?.service_area);
 
     window.allAssignments = assignRes.data || []; // NEW: Store assignments globally
     
@@ -1188,6 +1188,7 @@ function populateAssignCleanerSelect() {
 </div>
 </body>
 </html>
+
 
 
 
