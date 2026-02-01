@@ -531,19 +531,21 @@ document.getElementById('filterJobStatus').onchange = refreshUI;
             await loadData();
         }
 
-        // --- DATA ---
+       // --- DATA ---
 window.loadData = async function loadData() {
     const supabase = window.adminSupabase;
-   const [availRes, jobsRes, assignRes, usersRes] = await Promise.all([
-    supabase.from('cleaner_availability_time_slots').select('*'),
-    supabase.from('jobs').select('*'),
-    supabase.from('job_assignments').select('*'),
-    supabase.from('profiles').select('id,email') // OR users table
-]);
- window.cleanerEmailMap = {};
-(usersRes.data || []).forEach(u => {
-    window.cleanerEmailMap[u.id] = u.email;
-});
+    const [availRes, jobsRes, assignRes, usersRes] = await Promise.all([
+        supabase.from('cleaner_availability_time_slots').select('*'),
+        supabase.from('jobs').select('*'),
+        supabase.from('job_assignments').select('*'),
+        supabase.from('profiles').select('id,email') // Ensure your table is named 'profiles' or 'users'
+    ]);
+
+    // Create a temporary map of ID -> Email
+    window.cleanerEmailMap = {};
+    (usersRes.data || []).forEach(u => {
+        window.cleanerEmailMap[u.id] = u.email;
+    });
 
 
     if (availRes.error) console.error("AVAIL ERROR", availRes.error);
@@ -588,11 +590,11 @@ if (assignRes.error) console.error("ASSIGN ERROR", assignRes.error);
                 const uid = userRow ? userRow.user_id : null;
 
                 staffMap[name] = { 
-    id: uid, 
-    email: window.cleanerEmailMap?.[uid] || null,
-    color, 
-    initials 
-};
+                    id: uid, 
+                    email: window.cleanerEmailMap?.[uid] || "No email found in DB",
+                    color, 
+                    initials 
+                };
 
                 colorIdx++;
 
@@ -1274,6 +1276,7 @@ function populateAssignCleanerSelect() {
 </div>
 </body>
 </html>
+
 
 
 
