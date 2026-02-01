@@ -542,13 +542,13 @@ window.loadData = async function loadData() {
 
     if (availRes.error) console.error("AVAIL ERROR", availRes.error);
 if (jobsRes.error) console.error("JOBS ERROR", jobsRes.error);
-	
+	console.log("DEBUG: Data check - Job 0 Area:", window.allJobs[0]?.service_area);
 if (assignRes.error) console.error("ASSIGN ERROR", assignRes.error);
 
     
     window.allShifts = availRes.data || [];
-window.allJobs = jobsRes.data || [];
-console.log("DEBUG: Data check - Job 0 Area:", window.allJobs[0]?.service_area);
+    window.allJobs = jobsRes.data || [];
+	console.log("ALL JOBS LOADED:", window.allJobs);
 
     window.allAssignments = assignRes.data || []; // NEW: Store assignments globally
     
@@ -793,9 +793,7 @@ document.getElementById('modalArea').value = shift.service_area || "";
         }
 
         window.closeModal = function() { modal.style.display = 'none'; }
-window.closeJobModal = function() {
-    document.getElementById('jobAssignmentModal').style.display = 'none';
-}
+
         // --- DATABASE ACTIONS ---
         async function saveShift() {
             const id = document.getElementById('slotId').value;
@@ -1182,15 +1180,12 @@ function populateAssignCleanerSelect() {
         <div class="modal-actions" style="margin-top: 25px;">
             <button class="primary-btn btn-full" onclick="saveJobAssignment()">Save Assignment</button>
             <button type="button" class="primary-btn btn-full" style="background: #3b82f6; margin-left: 10px;" onclick="notifyCleaner()">Notify Cleaner</button>
-            <button class="nav-icon-btn" style="width:40px;" onclick="closeJobModal()">✕</button>
+            <button class="nav-icon-btn" style="width:40px;" onclick="closeAssignmentModal()">✕</button>
         </div>
     </div>
 </div>
 </body>
 </html>
-
-
-
 
 
 
