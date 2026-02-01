@@ -1000,10 +1000,10 @@ async function notifyCleaner() {
     const time = document.getElementById('editJobTime').value;
     const date = document.getElementById('viewDate')?.innerText || "N/A";
     
-    // 1. Find all dropdowns (primary + any added rows)
+    // 1. Find all dropdowns (the primary one and any added rows)
     const cleanerRows = document.querySelectorAll('.cleaner-select');
     
-    // 2. Extract full details (Name & Email) for every selected cleaner
+    // 2. Extract Name & Email for every selected cleaner
     const assignedStaff = Array.from(cleanerRows)
         .map(select => {
             const name = select.value;
@@ -1013,7 +1013,7 @@ async function notifyCleaner() {
                 email: details.email || "No email on file" 
             };
         })
-        .filter(staff => staff.name !== ""); // Ignore empty dropdowns
+        .filter(staff => staff.name !== ""); // Ignore empty rows
 
     if (assignedStaff.length === 0) {
         alert("Please assign at least one cleaner before notifying.");
@@ -1026,7 +1026,7 @@ async function notifyCleaner() {
         address: address,
         scheduled_time: time,
         scheduled_date: date,
-        cleaners: assignedStaff // This sends the Array of Collections to Make
+        cleaners: assignedStaff // Sends Array of {name, email} to Make
     };
 
     try {
@@ -1274,6 +1274,7 @@ function populateAssignCleanerSelect() {
 </div>
 </body>
 </html>
+
 
 
 
