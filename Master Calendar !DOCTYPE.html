@@ -695,98 +695,63 @@ const jobStatusFilter = document.getElementById('filterJobStatus').value;
         });
 
         // --- 2. RENDER JOBS ---
-        const jobs = (window.allJobs || []).filter(j => {
-    if (!j.scheduled_start) return false;
+       const jobs = (window.allJobs || []).filter(j => {
+            if (!j.scheduled_start) return false;
 
-    const jobDate = j.scheduled_start.split('T')[0];
-    if (jobDate !== dateKey) return false;
-    if (areaFilter !== "ALL" && j.service_area !== areaFilter) return false;
+            // Convert to simple date string (YYYY-MM-DD) for matching
+            const jobDate = new Date(j.scheduled_start).toISOString().split('T')[0];
+            
+            if (jobDate !== dateKey) return false;
+            if (areaFilter !== "ALL" && j.service_area !== areaFilter) return false;
 
-    // ✅ NEW SOURCE OF TRUTH: job_assignments
-    const assignments = (window.allAssignments || []).filter(
-        a => a.job_id === j.job_id
-    );
+            // Get assignments for this specific job
+            const assignments = (window.allAssignments || []).filter(a => a.job_id === j.job_id);
+            const isAssigned = assignments.length > 0;
 
-    const isAssigned = assignments.length > 0;
+            // Job Status Filtering logic
+            if (jobStatusFilter === "UNASSIGNED" && isAssigned) return false;
+            if (jobStatusFilter === "ASSIGNED" && !isAssigned) return false;
+            
+            // Conflict check: is at least one assigned cleaner missing availability?
+            if (jobStatusFilter === "CONFLICT") {
+                const hasConflict = assignments.some(a => {
+                    const cleanerName = Object.keys(window.staffMap || {})
+                        .find(name => window.staffMap[name]?.id === a.cleaner_id);
+                    if (!cleanerName) return true;
+                    return !window.allShifts.some(s => s.user_name === cleanerName && s.date === jobDate);
+                });
+                if (!hasConflict) return false;
+            }
 
-    // Conflict = assigned cleaner has no availability that day
-    let hasConflict = false;
-    if (isAssigned) {
-        hasConflict = assignments.some(a => {
-            const cleanerName = Object.keys(window.staffMap)
-                .find(name => window.staffMap[name].id === a.cleaner_id);
-
-            return !window.allShifts.some(
-                s => s.user_name === cleanerName && s.date === jobDate
-            );
+            return true;
         });
-    }
-
-    if (jobStatusFilter === "UNASSIGNED" && isAssigned) return false;
-    if (jobStatusFilter === "ASSIGNED" && !isAssigned) return false;
-    if (jobStatusFilter === "CONFLICT" && !hasConflict) return false;
-
-    return true;
-});
 
             
 
-            jobs.forEach(job => {
-    const assignments = (window.allAssignments || []).filter(
-        a => a.job_id === job.job_id
-    );
+         jobs.forEach(job => {
+            const assignments = (window.allAssignments || []).filter(a => a.job_id === job.job_id);
+            const isAssigned = assignments.length > 0;
 
-    const isAssigned = assignments.length > 0;
-    const jobDate = job.scheduled_start.split('T')[0];
+            const pill = document.createElement('div');
+            pill.className = 'shift-pill';
+            pill.style.background = '#000';
+            pill.style.border = `1px solid ${isAssigned ? 'var(--primary)' : 'var(--danger)'}`;
+            pill.style.borderLeft = `4px solid ${isAssigned ? 'var(--primary)' : 'var(--danger)'}`;
 
-    let hasConflict = false;
-    if (isAssigned) {
-        hasConflict = assignments.some(a => {
-            const cleanerName = Object.keys(window.staffMap)
-                .find(name => window.staffMap[name].id === a.cleaner_id);
+            pill.innerHTML = `
+                <span class="pill-time" style="color:white; font-weight:800;">JOB</span>
+                <span class="pill-name" style="color:white;">${job.first_name} ${job.last_name}</span>
+                <div class="pill-loc" style="background:${isAssigned ? 'var(--primary)' : 'var(--danger)'}; color:black; font-weight:bold; top:2px; right:2px; opacity:1;">
+                    ${assignments.length} CLN
+                </div>
+            `;
 
-            return !window.allShifts.some(
-                s => s.user_name === cleanerName && s.date === jobDate
-            );
+            pill.onclick = (e) => {
+                e.stopPropagation();
+                openJobAssignmentModal(job);
+            };
+            container.appendChild(pill);
         });
-    }
-
-    const pill = document.createElement('div');
-    pill.className = 'shift-pill';
-    pill.style.background = '#000';
-    pill.style.border = `1px solid ${
-        hasConflict ? '#f59e0b' : (isAssigned ? 'var(--primary)' : 'var(--danger)')
-    }`;
-    pill.style.borderLeft = `4px solid ${
-        hasConflict ? '#f59e0b' : (isAssigned ? 'var(--primary)' : 'var(--danger)')
-    }`;
-
-    pill.innerHTML = `
-        <span class="pill-time" style="color:white; font-weight:800;">
-            ${hasConflict ? '⚠️ CONFLICT' : 'JOB'}
-        </span>
-        <span class="pill-name" style="color:white;">
-            ${job.first_name} ${job.last_name}
-        </span>
-        <div class="pill-loc" style="
-            background:${hasConflict ? '#f59e0b' : (isAssigned ? 'var(--primary)' : 'var(--danger)')};
-            color:black;
-            opacity:1;
-            font-weight:bold;
-            top:2px;
-            right:2px;
-        ">
-            ${assignments.length} CLEANER${assignments.length !== 1 ? 'S' : ''}
-        </div>
-    `;
-
-    pill.onclick = (e) => {
-        e.stopPropagation();
-        openJobAssignmentModal(job);
-    };
-
-    container.appendChild(pill);
-});
 
     } // This brace closes the for-loop of days
 } // This brace closes the refreshUI function
@@ -1217,3 +1182,4 @@ function populateAssignCleanerSelect() {
 </div>
 </body>
 </html>
+
