@@ -540,10 +540,15 @@ window.loadData = async function loadData() {
         supabase.from('job_assignments').select('*') // NEW: Fetch payout info
     ]);
 
-    if(availRes.error || jobsRes.error || assignRes.error) return console.error("Data Fetch Error");
+    if (availRes.error) console.error("AVAIL ERROR", availRes.error);
+if (jobsRes.error) console.error("JOBS ERROR", jobsRes.error);
+if (assignRes.error) console.error("ASSIGN ERROR", assignRes.error);
+
     
     window.allShifts = availRes.data || [];
     window.allJobs = jobsRes.data || [];
+	console.log("ALL JOBS LOADED:", window.allJobs);
+
     window.allAssignments = assignRes.data || []; // NEW: Store assignments globally
     
     processStaff(window.allShifts);
@@ -700,6 +705,8 @@ const jobStatusFilter = document.getElementById('filterJobStatus').value;
 
             // Convert to simple date string (YYYY-MM-DD) for matching
             const jobDate = j.scheduled_start.split('T')[0];
+console.log("JOB DATE:", jobDate, "COL DATE:", dateKey);
+
 
             
             if (jobDate !== dateKey) return false;
@@ -730,6 +737,8 @@ const jobStatusFilter = document.getElementById('filterJobStatus').value;
             
 
          jobs.forEach(job => {
+			 console.log("RENDERING JOB:", job.job_id, job.scheduled_start);
+
             const assignments = (window.allAssignments || []).filter(a => a.job_id === job.job_id);
             const isAssigned = assignments.length > 0;
 
@@ -751,6 +760,9 @@ const jobStatusFilter = document.getElementById('filterJobStatus').value;
                 e.stopPropagation();
                 openJobAssignmentModal(job);
             };
+			 pill.style.display = "block";
+pill.style.opacity = "1";
+
             container.appendChild(pill);
         });
 
@@ -1183,5 +1195,6 @@ function populateAssignCleanerSelect() {
 </div>
 </body>
 </html>
+
 
 
