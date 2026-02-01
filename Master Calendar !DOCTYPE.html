@@ -542,6 +542,7 @@ window.loadData = async function loadData() {
 
     if (availRes.error) console.error("AVAIL ERROR", availRes.error);
 if (jobsRes.error) console.error("JOBS ERROR", jobsRes.error);
+	console.log("DEBUG: Data check - Job 0 Area:", window.allJobs[0]?.service_area);
 if (assignRes.error) console.error("ASSIGN ERROR", assignRes.error);
 
     
@@ -703,34 +704,22 @@ const jobStatusFilter = document.getElementById('filterJobStatus').value;
        const jobs = (window.allJobs || []).filter(j => {
             if (!j.scheduled_start) return false;
 
-            // Convert to simple date string (YYYY-MM-DD) for matching
-            const jobDate = j.scheduled_start.split('T')[0];
-console.log("JOB DATE:", jobDate, "COL DATE:", dateKey);
-
-
+            // Robust extraction of YYYY-MM-DD regardless of format
+            const jobDate = new Date(j.scheduled_start).toISOString().split('T')[0];
             
+            // 1. Check if the job matches the current calendar day column
             if (jobDate !== dateKey) return false;
+            
+            // 2. Filter by Service Area
             if (areaFilter !== "ALL" && j.service_area !== areaFilter) return false;
 
-            // Get assignments for this specific job
+            // 3. Status Filtering logic
             const assignments = (window.allAssignments || []).filter(a => a.job_id === j.job_id);
             const isAssigned = assignments.length > 0;
 
-            // Job Status Filtering logic
             if (jobStatusFilter === "UNASSIGNED" && isAssigned) return false;
             if (jobStatusFilter === "ASSIGNED" && !isAssigned) return false;
             
-            // Conflict check: is at least one assigned cleaner missing availability?
-            if (jobStatusFilter === "CONFLICT") {
-                const hasConflict = assignments.some(a => {
-                    const cleanerName = Object.keys(window.staffMap || {})
-                        .find(name => window.staffMap[name]?.id === a.cleaner_id);
-                    if (!cleanerName) return true;
-                    return !window.allShifts.some(s => s.user_name === cleanerName && s.date === jobDate);
-                });
-                if (!hasConflict) return false;
-            }
-
             return true;
         });
 
@@ -744,6 +733,8 @@ console.log("JOB DATE:", jobDate, "COL DATE:", dateKey);
 
             const pill = document.createElement('div');
             pill.className = 'shift-pill';
+			 pill.style.display = "block";
+pill.style.zIndex = "10";
             pill.style.background = '#000';
             pill.style.border = `1px solid ${isAssigned ? 'var(--primary)' : 'var(--danger)'}`;
             pill.style.borderLeft = `4px solid ${isAssigned ? 'var(--primary)' : 'var(--danger)'}`;
@@ -1195,6 +1186,7 @@ function populateAssignCleanerSelect() {
 </div>
 </body>
 </html>
+
 
 
 
