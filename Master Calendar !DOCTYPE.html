@@ -1067,19 +1067,13 @@ duration_hours: parseFloat(document.getElementById('editJobDuration').value) || 
 document.addEventListener('click', function(e) {
     if (e.target && e.target.id === 'addMoreCleanersBtn') {
         const container = document.getElementById('cleanerAssignmentContainer');
-        const firstSelect = container.querySelector('.cleaner-select');
+        const firstRow = container.querySelector('.cleaner-row');
+        const newRow = firstRow.cloneNode(true);
         
-        // Clone the existing dropdown row
-        const newRow = document.createElement('div');
-        newRow.className = 'cleaner-row';
-        newRow.style.display = 'flex';
-        newRow.style.gap = '10px';
-        newRow.style.alignItems = 'center';
+        // Reset the selection and add a remove button
+        const newSelect = newRow.querySelector('.cleaner-select');
+        newSelect.value = "";
         
-        const newSelect = firstSelect.cloneNode(true);
-        newSelect.value = ""; // Reset selection for the new dropdown
-        
-        // Add a remove button for the new row
         const removeBtn = document.createElement('button');
         removeBtn.innerHTML = '✕';
         removeBtn.className = 'nav-icon-btn';
@@ -1087,7 +1081,6 @@ document.addEventListener('click', function(e) {
         removeBtn.style.borderColor = 'var(--danger)';
         removeBtn.onclick = () => newRow.remove();
 
-        newRow.appendChild(newSelect);
         newRow.appendChild(removeBtn);
         container.appendChild(newRow);
     }
@@ -1191,19 +1184,19 @@ function populateAssignCleanerSelect() {
             </div>
         </div>
 
-       <div class="form-group">
-            <label class="form-label">Assigned Cleaners</label>
-            <div id="cleanerAssignmentContainer" style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 10px;">
-                <div class="cleaner-row" style="display: flex; gap: 10px; align-items: center;">
-                    <select class="form-input cleaner-select" style="flex: 1; border-color: var(--primary);">
-                        <option value="">-- Select Cleaner --</option>
-                    </select>
-                </div>
-            </div>
-            <button type="button" id="addMoreCleanersBtn" class="primary-btn" style="background: transparent; border: 1px solid var(--primary); color: var(--primary); width: 100%; font-size: 11px;">
-                + Add Another Cleaner
-            </button>
+      <div class="form-group">
+    <label class="form-label">Assigned Cleaners</label>
+    <div id="cleanerAssignmentContainer" style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 10px;">
+        <div class="cleaner-row" style="display: flex; gap: 10px; align-items: center;">
+            <select class="form-input cleaner-select" style="flex: 1; border-color: var(--primary);">
+                <option value="">-- Select Cleaner --</option>
+            </select>
         </div>
+    </div>
+    <button type="button" id="addMoreCleanersBtn" class="primary-btn" style="background: transparent; border: 1px solid var(--primary); color: var(--primary); width: 100%; font-size: 11px;">
+        + Add Another Cleaner
+    </button>
+</div>
 
         <div id="conflictWarning" style="display:none; margin-top: 10px; padding: 10px; background: rgba(245, 158, 11, 0.1); border: 1px solid #f59e0b; border-radius: 6px; font-size: 12px; color: #f59e0b;">
             ⚠️ <strong>Conflict:</strong> This cleaner hasn't posted availability for this date.
@@ -1221,6 +1214,7 @@ function populateAssignCleanerSelect() {
 </div>
 </body>
 </html>
+
 
 
 
