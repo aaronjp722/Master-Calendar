@@ -797,6 +797,9 @@ document.getElementById('modalArea').value = shift.service_area || "";
         }
 
         window.closeModal = function() { modal.style.display = 'none'; }
+		window.closeAssignmentModal = function() {
+    document.getElementById('jobAssignmentModal').style.display = 'none';
+};
 
         // --- DATABASE ACTIONS ---
         async function saveShift() {
@@ -1215,7 +1218,7 @@ function populateAssignCleanerSelect() {
     <label class="form-label">Assigned Cleaners</label>
     <div id="cleanerAssignmentContainer" style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 10px;">
         <div class="cleaner-row" style="display: flex; gap: 10px; align-items: center;">
-            <select class="form-input cleaner-select" style="flex: 1; border-color: var(--primary);">
+            <select id="assignCleanerSelect" class="form-input cleaner-select" style="flex: 1; border-color: var(--primary);">
                 <option value="">-- Select Cleaner --</option>
             </select>
         </div>
