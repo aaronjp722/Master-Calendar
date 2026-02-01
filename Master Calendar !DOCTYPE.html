@@ -645,7 +645,10 @@ const jobStatusFilter = document.getElementById('filterJobStatus').value;
     for(let i=0; i < totalDays; i++) {
         const day = new Date(startDate);
         day.setDate(startDate.getDate() + i);
-        const dateKey = day.toISOString().split('T')[0];
+       const dateKey = day.getFullYear() + '-' +
+    String(day.getMonth() + 1).padStart(2, '0') + '-' +
+    String(day.getDate()).padStart(2, '0');
+
         const isToday = new Date().toDateString() === day.toDateString();
         const isCurrentMonth = day.getMonth() === currentDate.getMonth();
 
@@ -704,7 +707,9 @@ const jobStatusFilter = document.getElementById('filterJobStatus').value;
             if (!j.scheduled_start) return false;
 
             // Robust extraction of YYYY-MM-DD regardless of format
-            const jobDate = new Date(j.scheduled_start).toISOString().split('T')[0];
+            if (!j.scheduled_start || !j.scheduled_start.includes('T')) return false;
+const jobDate = j.scheduled_start.split('T')[0];
+
             
             // 1. Check if the job matches the current calendar day column
             if (jobDate !== dateKey) return false;
@@ -1226,6 +1231,7 @@ function populateAssignCleanerSelect() {
 </div>
 </body>
 </html>
+
 
 
 
