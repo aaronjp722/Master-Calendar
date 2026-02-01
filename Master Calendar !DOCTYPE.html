@@ -542,7 +542,6 @@ window.loadData = async function loadData() {
 
     if (availRes.error) console.error("AVAIL ERROR", availRes.error);
 if (jobsRes.error) console.error("JOBS ERROR", jobsRes.error);
-	console.log("DEBUG: Data check - Job 0 Area:", window.allJobs[0]?.service_area);
 if (assignRes.error) console.error("ASSIGN ERROR", assignRes.error);
 
     
@@ -1067,20 +1066,33 @@ duration_hours: parseFloat(document.getElementById('editJobDuration').value) || 
 document.addEventListener('click', function(e) {
     if (e.target && e.target.id === 'addMoreCleanersBtn') {
         const container = document.getElementById('cleanerAssignmentContainer');
-        const firstRow = container.querySelector('.cleaner-row');
-        const newRow = firstRow.cloneNode(true);
         
-        // Reset the selection and add a remove button
-        const newSelect = newRow.querySelector('.cleaner-select');
-        newSelect.value = "";
+        // Create new row
+        const newRow = document.createElement('div');
+        newRow.className = 'cleaner-row';
+        newRow.style.cssText = "display: flex; gap: 10px; align-items: center; margin-top: 10px;";
         
+        // Create select and fill with current staff list
+        const newSelect = document.createElement('select');
+        newSelect.className = 'form-input cleaner-select';
+        newSelect.style.cssText = "flex: 1; border-color: var(--primary);";
+        newSelect.innerHTML = '<option value="">-- Select Cleaner --</option>';
+        
+        Object.keys(window.staffMap).forEach(name => {
+            const opt = document.createElement('option');
+            opt.value = name;
+            opt.textContent = name;
+            newSelect.appendChild(opt);
+        });
+
+        // Add remove button
         const removeBtn = document.createElement('button');
         removeBtn.innerHTML = '✕';
         removeBtn.className = 'nav-icon-btn';
-        removeBtn.style.color = 'var(--danger)';
-        removeBtn.style.borderColor = 'var(--danger)';
+        removeBtn.style.cssText = "width:32px; height:32px; color:var(--danger); border-color:var(--danger); display:flex; align-items:center; justify-content:center;";
         removeBtn.onclick = () => newRow.remove();
 
+        newRow.appendChild(newSelect);
         newRow.appendChild(removeBtn);
         container.appendChild(newRow);
     }
@@ -1110,7 +1122,7 @@ function populateAssignCleanerSelect() {
         </div>
         
        <div style="overflow-y: auto; flex: 1; padding-right: 10px; margin-bottom: 20px; scrollbar-width: thin; scrollbar-color: var(--primary) transparent;" id="modalScrollBody">
-            <input type="hidden" id="assignJobId">
+            
             
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; background: var(--bg-body); padding: 15px; border-radius: 8px; border: 1px solid var(--border);">
 
@@ -1214,6 +1226,7 @@ function populateAssignCleanerSelect() {
 </div>
 </body>
 </html>
+
 
 
 
