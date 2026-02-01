@@ -1232,22 +1232,23 @@ function populateAssignCleanerSelect() {
 
       <div class="form-group">
     <label class="form-label">Assigned Cleaners</label>
+
     <div id="cleanerAssignmentContainer" style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 10px;">
         <div class="cleaner-row" style="display: flex; gap: 10px; align-items: center;">
-    <select id="assignCleanerSelect" class="form-input cleaner-select" style="flex: 1; border-color: var(--primary);">
-        <option value="">-- Select Cleaner --</option>
-    </select>
-    <div style="width: 32px;"></div> 
-</div>
             <select id="assignCleanerSelect" class="form-input cleaner-select" style="flex: 1; border-color: var(--primary);">
                 <option value="">-- Select Cleaner --</option>
             </select>
+            <div style="width: 32px;"></div>
         </div>
     </div>
-    <button type="button" id="addMoreCleanersBtn" class="primary-btn" style="background: transparent; border: 1px solid var(--primary); color: var(--primary); width: 100%; font-size: 11px;">
+
+    <button type="button" id="addMoreCleanersBtn"
+        class="primary-btn"
+        style="background: transparent; border: 1px solid var(--primary); color: var(--primary); width: 100%; font-size: 11px;">
         + Add Another Cleaner
     </button>
 </div>
+
 
         <div id="conflictWarning" style="display:none; margin-top: 10px; padding: 10px; background: rgba(245, 158, 11, 0.1); border: 1px solid #f59e0b; border-radius: 6px; font-size: 12px; color: #f59e0b;">
             ⚠️ <strong>Conflict:</strong> This cleaner hasn't posted availability for this date.
@@ -1265,6 +1266,7 @@ function populateAssignCleanerSelect() {
 </div>
 </body>
 </html>
+
 
 
 
