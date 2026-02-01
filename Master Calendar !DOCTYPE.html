@@ -534,12 +534,20 @@ document.getElementById('filterJobStatus').onchange = refreshUI;
        // --- DATA ---
 window.loadData = async function loadData() {
     const supabase = window.adminSupabase;
+
     const [availRes, jobsRes, assignRes, usersRes] = await Promise.all([
         supabase.from('cleaner_availability_time_slots').select('*'),
         supabase.from('jobs').select('*'),
         supabase.from('job_assignments').select('*'),
-        supabase.from('profiles').select('id,email') // Ensure your table is named 'profiles' or 'users'
+        supabase.from('profiles').select('id,email')
     ]);
+
+    // --- BUILD ID → EMAIL MAP (SOURCE OF TRUTH) ---
+    window.profileById = {};
+    (usersRes.data || []).forEach(p => {
+        window.profileById[p.id] = p.email;
+    });
+
 
     // Create a temporary map of ID -> Email
     window.cleanerEmailMap = {};
@@ -586,15 +594,16 @@ if (assignRes.error) console.error("ASSIGN ERROR", assignRes.error);
             names.forEach(name => {
                 const color = colors[colorIdx % colors.length];
                 const initials = name.split(' ').map(n=>n[0]).join('').substring(0,2).toUpperCase();
-                const userRow = data.find(d => d.user_name === name);
-                const uid = userRow ? userRow.user_id : null;
+              const userRow = data.find(d => d.user_name === name);
+const uid = userRow?.user_id || null;
 
-                staffMap[name] = { 
-                    id: uid, 
-                    email: window.cleanerEmailMap?.[uid] || "No email found in DB",
-                    color, 
-                    initials 
-                };
+staffMap[name] = {
+    id: uid,
+    email: uid ? window.profileById[uid] || null : null,
+    color,
+    initials
+};
+
 
                 colorIdx++;
 
@@ -995,6 +1004,17 @@ if (priceEl) {
     document.getElementById('jobAssignmentModal').style.display = 'flex';
 }
 
+	const invalid = assignedStaff.filter(c => !c.email);
+
+if (invalid.length > 0) {
+    alert(
+        `Cannot notify:\n` +
+        invalid.map(c => `${c.name} has no email on file`).join('\n')
+    );
+    return;
+}
+
+
 async function notifyCleaner() {
     const jobId = document.getElementById('assignJobId').value;
     const customer = document.getElementById('editJobFirstName').value + ' ' + document.getElementById('editJobLastName').value;
@@ -1005,15 +1025,20 @@ async function notifyCleaner() {
     // 1. Find all dropdowns (the primary one and any added rows)
     const cleanerRows = document.querySelectorAll('.cleaner-select');
     
-    // 2. Extract Name & Email for every selected cleaner
-    const assignedStaff = Array.from(cleanerRows)
-        .map(select => {
-            const name = select.value;
-            const details = window.staffMap[name] || {};
-            return {
-                name: name,
-                email: details.email || "No email on file" 
-            };
+    // 2. Extract Name, ID & Email for every selected cleaner
+const assignedStaff = Array.from(cleanerRows)
+    .map(select => {
+        const name = select.value;
+        const details = window.staffMap[name] || {};
+        return {
+            name,
+            cleaner_id: details.id,
+            email: details.email
+        };
+    })
+    .filter(staff => staff.name); // optional safety
+
+
         })
         .filter(staff => staff.name !== ""); // Ignore empty rows
 
@@ -1276,6 +1301,7 @@ function populateAssignCleanerSelect() {
 </div>
 </body>
 </html>
+
 
 
 
