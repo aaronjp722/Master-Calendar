@@ -996,6 +996,47 @@ if (priceEl) {
     document.getElementById('jobAssignmentModal').style.display = 'flex';
 }
 
+async function notifyCleaner() {
+    const jobId = document.getElementById('assignJobId').value;
+    const customer = document.getElementById('editJobFirstName').value + ' ' + document.getElementById('editJobLastName').value;
+    const address = document.getElementById('editJobAddress').value + ', ' + document.getElementById('editJobCity').value;
+    const time = document.getElementById('editJobTime').value;
+    const date = document.getElementById('modalDate')?.value || "N/A";
+    
+    // Get the assigned cleaner name from your single dropdown
+    const cleanerName = document.getElementById('assignCleanerSelect').value;
+
+    if (!cleanerName || cleanerName === "") {
+        alert("Please assign a cleaner before notifying.");
+        return;
+    }
+
+    const payload = {
+        job_id: jobId,
+        customer_name: customer,
+        address: address,
+        scheduled_time: time,
+        scheduled_date: date,
+        cleaners: [cleanerName] // Sending as an array for Make.com compatibility
+    };
+
+    try {
+        const response = await fetch("https://hook.us1.make.com/ika9psuwxp6yu2pal7upkp6way1vp77m", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+        });
+
+        if (response.ok) {
+            alert("Cleaner notified successfully!");
+        } else {
+            alert("Notification failed. Check your Make.com scenario.");
+        }
+    } catch (err) {
+        console.error("Webhook Error:", err);
+        alert("Error sending notification.");
+    }
+}
 async function saveJobAssignment() {
     const jobId = document.getElementById('assignJobId').value;
     const cleanerName = document.getElementById('assignCleanerSelect').value;
@@ -1169,6 +1210,7 @@ function populateAssignCleanerSelect() {
 
         <div class="modal-actions" style="margin-top: 25px;">
             <button class="primary-btn btn-full" onclick="saveJobAssignment()">Save Assignment</button>
+            <button type="button" class="primary-btn btn-full" style="background: #3b82f6; margin-left: 10px;" onclick="notifyCleaner()">Notify Cleaner</button>
             <button class="nav-icon-btn" style="width:40px;" onclick="closeAssignmentModal()">✕</button>
         </div>
     </div>
