@@ -1036,7 +1036,11 @@ const assignedStaff = Array.from(cleanerRows)
             email: details.email
         };
     })
-    .filter(staff => staff.name && staff.name !== ""); // Combined filter logic
+    .filter(staff => staff.name); // optional safety
+
+
+        })
+        .filter(staff => staff.name !== ""); // Ignore empty rows
 
     if (assignedStaff.length === 0) {
         alert("Please assign at least one cleaner before notifying.");
@@ -1297,8 +1301,6 @@ function populateAssignCleanerSelect() {
 </div>
 </body>
 </html>
-
-
 
 
 
