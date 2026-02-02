@@ -594,15 +594,18 @@ if (assignRes.error) console.error("ASSIGN ERROR", assignRes.error);
             names.forEach(name => {
                 const color = colors[colorIdx % colors.length];
                 const initials = name.split(' ').map(n=>n[0]).join('').substring(0,2).toUpperCase();
-              const userRow = data.find(d => d.user_name === name);
-const uid = userRow?.user_id || null;
+              // find ANY row with a valid user_id
+const validRow = data.find(d => d.user_name === name && d.user_id);
+
+const uid = validRow?.user_id || null;
 
 staffMap[name] = {
-    id: uid,
-    email: uid ? window.profileById[uid] || null : null,
-    color,
-    initials
+  id: uid,
+  email: uid ? window.profileById[uid] ?? null : null,
+  color,
+  initials
 };
+
 
 
                 colorIdx++;
@@ -1296,6 +1299,7 @@ function populateAssignCleanerSelect() {
 </div>
 </body>
 </html>
+
 
 
 
