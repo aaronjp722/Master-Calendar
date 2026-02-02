@@ -1026,21 +1026,21 @@ async function notifyCleaner() {
     const cleanerRows = document.querySelectorAll('.cleaner-select');
     
     // 2. Extract Name, ID & Email for every selected cleaner
-const assignedStaff = Array.from(cleanerRows)
-    .map(select => {
-        const name = select.value;
-        const details = window.staffMap[name] || {};
-        return {
-            name,
-            cleaner_id: details.id,
-            email: details.email
-        };
-    })
-    .filter(staff => staff.name); // optional safety
-
-
+// Find this section around line 1030 in your editor
+    const assignedStaff = Array.from(cleanerRows)
+        .map(select => {
+            const name = select.value;
+            const details = window.staffMap[name] || {};
+            return {
+                name,
+                cleaner_id: details.id,
+                email: details.email // This pulls the email from your global staffMap
+            };
         })
-        .filter(staff => staff.name !== ""); // Ignore empty rows
+        .filter(staff => staff.name && staff.name !== ""); // This replaces the broken disconnected filter
+
+
+
 
     if (assignedStaff.length === 0) {
         alert("Please assign at least one cleaner before notifying.");
@@ -1301,6 +1301,7 @@ function populateAssignCleanerSelect() {
 </div>
 </body>
 </html>
+
 
 
 
