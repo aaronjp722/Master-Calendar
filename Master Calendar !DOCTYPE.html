@@ -572,61 +572,64 @@ if (assignRes.error) console.error("ASSIGN ERROR", assignRes.error);
     refreshUI();
 }
 
-        function processStaff(data) {
-    window.staffMap = {}; // Update the global reference
-    staffMap = window.staffMap;
-            const filterSelect = document.getElementById('filterCleaner');
-            const modalSelect = document.getElementById('modalCleaner');
-            const listContainer = document.getElementById('staffListContainer');
+        function processStaff(slots) {
+    window.staffMap = {};
+    const staffMap = window.staffMap;
 
-            filterSelect.innerHTML = '<option value="ALL">All Cleaners</option>';
-            modalSelect.innerHTML = '<option value="" disabled selected>Select Staff...</option>';
-            listContainer.innerHTML = '';
+    const filterSelect = document.getElementById('filterCleaner');
+    const modalSelect = document.getElementById('modalCleaner');
+    const listContainer = document.getElementById('staffListContainer');
 
-            let colorIdx = 0;
-            // 1. Get names from current shifts
-            let shiftNames = data.map(d => d.user_name).filter(n => n);
-            
-            // 2. Add "Master List" (Melissa, Sara, etc.) to ensure they always show up
-            const masterList = ["Melissa Cook", "Sara Smith", "Aaron Parker"];
-            const names = [...new Set([...shiftNames, ...masterList])].sort();
+    filterSelect.innerHTML = '<option value="ALL">All Cleaners</option>';
+    modalSelect.innerHTML = '<option value="" disabled selected>Select Staff...</option>';
+    listContainer.innerHTML = '';
 
-            names.forEach(name => {
-                const color = colors[colorIdx % colors.length];
-                const initials = name.split(' ').map(n=>n[0]).join('').substring(0,2).toUpperCase();
-              // find ANY row with a valid user_id
-const validRow = data.find(d => d.user_name === name && d.user_id);
+    let colorIdx = 0;
 
-const uid = validRow?.user_id || null;
+    // 1. Get unique user_ids from slots
+    const userIds = [...new Set(slots.map(s => s.user_id).filter(Boolean))];
 
-staffMap[name] = {
-  id: uid,
-  email: uid ? window.profileById[uid] ?? null : null,
-  color,
-  initials
-};
-
-
-
-                colorIdx++;
-
-                filterSelect.add(new Option(name, name));
-                modalSelect.add(new Option(name, name));
-
-                const item = document.createElement('div');
-                item.className = 'staff-item';
-                item.innerHTML = `
-                    <div class="staff-avatar" style="background:${color}">${initials}</div>
-                    <span class="staff-name">${name}</span>
-                    <div class="staff-status"></div>
-                `;
-                item.onclick = () => {
-                    filterSelect.value = name;
-                    refreshUI();
-                };
-                listContainer.appendChild(item);
-            });
+    userIds.forEach(uid => {
+        const email = window.profileById[uid];
+        if (!email) {
+            console.warn("Missing email for user_id:", uid);
+            return;
         }
+
+        // Find a display name from any slot
+        const slot = slots.find(s => s.user_id === uid);
+        const name = slot?.user_name || email;
+
+        const color = colors[colorIdx % colors.length];
+        const initials = name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
+
+        staffMap[name] = {
+            id: uid,
+            email,
+            color,
+            initials
+        };
+
+        colorIdx++;
+
+        filterSelect.add(new Option(name, name));
+        modalSelect.add(new Option(name, name));
+
+        const item = document.createElement('div');
+        item.className = 'staff-item';
+        item.innerHTML = `
+            <div class="staff-avatar" style="background:${color}">${initials}</div>
+            <span class="staff-name">${name}</span>
+            <div class="staff-status"></div>
+        `;
+        item.onclick = () => {
+            filterSelect.value = name;
+            refreshUI();
+        };
+        listContainer.appendChild(item);
+    });
+}
+
 
         // --- RENDERING ---
       function refreshUI() {
@@ -1031,6 +1034,10 @@ async function notifyCleaner() {
             };
         })
         .filter(staff => staff.name && staff.name !== "");
+	
+	console.log("STAFF MAP SNAPSHOT", window.staffMap);
+console.log("ASSIGNED STAFF", assignedStaff);
+
 
     if (assignedStaff.length === 0) {
         alert("Please assign at least one cleaner before notifying.");
@@ -1299,6 +1306,7 @@ function populateAssignCleanerSelect() {
 </div>
 </body>
 </html>
+
 
 
 
