@@ -1004,15 +1004,6 @@ if (priceEl) {
     document.getElementById('jobAssignmentModal').style.display = 'flex';
 }
 
-	const invalid = assignedStaff.filter(c => !c.email);
-
-if (invalid.length > 0) {
-    alert(
-        `Cannot notify:\n` +
-        invalid.map(c => `${c.name} has no email on file`).join('\n')
-    );
-    return;
-}
 
 
 async function notifyCleaner() {
@@ -1304,6 +1295,7 @@ function populateAssignCleanerSelect() {
 </div>
 </body>
 </html>
+
 
 
 
