@@ -1022,11 +1022,10 @@ async function notifyCleaner() {
     const time = document.getElementById('editJobTime').value;
     const date = document.getElementById('viewDate')?.innerText || "N/A";
     
-    // 1. Find all dropdowns (the primary one and any added rows)
+    // 1. Find all dropdowns
     const cleanerRows = document.querySelectorAll('.cleaner-select');
     
-    // 2. Extract Name, ID & Email for every selected cleaner
-// Find this section around line 1030 in your editor
+    // 2. Extract details
     const assignedStaff = Array.from(cleanerRows)
         .map(select => {
             const name = select.value;
@@ -1034,16 +1033,20 @@ async function notifyCleaner() {
             return {
                 name,
                 cleaner_id: details.id,
-                email: details.email // This pulls the email from your global staffMap
+                email: details.email 
             };
         })
-        .filter(staff => staff.name && staff.name !== ""); // This replaces the broken disconnected filter
-
-
-
+        .filter(staff => staff.name && staff.name !== "");
 
     if (assignedStaff.length === 0) {
         alert("Please assign at least one cleaner before notifying.");
+        return;
+    }
+
+    // 3. This is where the email check BELONGS (inside the function)
+    const invalid = assignedStaff.filter(c => !c.email);
+    if (invalid.length > 0) {
+        alert(`Cannot notify:\n` + invalid.map(c => `${c.name} has no email on file`).join('\n'));
         return;
     }
 
@@ -1053,7 +1056,7 @@ async function notifyCleaner() {
         address: address,
         scheduled_time: time,
         scheduled_date: date,
-        cleaners: assignedStaff // Sends Array of {name, email} to Make
+        cleaners: assignedStaff 
     };
 
     try {
@@ -1072,7 +1075,7 @@ async function notifyCleaner() {
         console.error("Webhook Error:", err);
         alert("Error sending notification.");
     }
-}
+
 async function saveJobAssignment() {
     const jobId = document.getElementById('assignJobId').value;
     const cleanerName = document.getElementById('assignCleanerSelect').value;
@@ -1301,6 +1304,7 @@ function populateAssignCleanerSelect() {
 </div>
 </body>
 </html>
+
 
 
 
